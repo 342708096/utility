@@ -10,7 +10,7 @@ export default {
         const cookieSplit = document.cookie.split('; ');
         for (let i = 0; i < cookieSplit.length; i++) {
             const keyValue = cookieSplit[i].split('=');
-            cookie[keyValue[0]] = unescape(keyValue[1]);
+            cookie[keyValue[0]] = decodeURIComponent(keyValue[1]);
         }
 
         return name ? cookie[name] : cookie;
@@ -27,9 +27,9 @@ export default {
     set: function (domain, key, value, hour) {
         if (hour) {
             const i = new Date((new Date()).getTime() + hour * 36e5);
-            document.cookie = key + "=" + escape(value) + ";path=/;domain=" + domain + ";expires=" + i.toGMTString();
+            document.cookie = key + "=" + encodeURIComponent(value) + ";path=/;domain=" + domain + ";expires=" + i.toGMTString();
         } else {
-            document.cookie = key + "=" + escape(value) + ";path=/;domain=" + domain;
+            document.cookie = key + "=" + encodeURIComponent(value) + ";path=/;domain=" + domain;
         }
     }
 };
