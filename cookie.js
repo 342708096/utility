@@ -10,7 +10,7 @@ export default {
         const cookieSplit = document.cookie.split('; ');
         for (let i = 0; i < cookieSplit.length; i++) {
             const keyValue = cookieSplit[i].split('=');
-            cookie[keyValue[0]] = decodeURIComponent(keyValue[1]);
+            cookie[keyValue[0]] = unescape(keyValue[1]);
         }
 
         return name ? cookie[name] : cookie;
