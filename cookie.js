@@ -6,14 +6,9 @@ export default {
      * @returns {(string|object)} 返回字段值或整个cookie对象
      */
     get: function (name) {
-        const cookie = {};
-        const cookieSplit = document.cookie.split('; ');
-        for (let i = 0; i < cookieSplit.length; i++) {
-            const keyValue = cookieSplit[i].split('=');
-            cookie[keyValue[0]] = decodeURIComponent(keyValue[1]);
-        }
-
-        return name ? cookie[name] : cookie;
+        const reg = new RegExp("(^| )"+name+"=([^;]+)(?=;|$)")
+        const arr = document.cookie.match(reg)
+        return arr && decodeURIComponent(arr[2])
     },
 
     /**
@@ -24,12 +19,18 @@ export default {
      * @param {string} t - cookie值
      * @param {number} n - 过期小时数
      */
-    set: function (domain, key, value, hour) {
-        if (hour) {
-            const i = new Date((new Date()).getTime() + hour * 36e5);
-            document.cookie = key + "=" + encodeURIComponent(value) + ";path=/;domain=" + domain + ";expires=" + i.toGMTString();
-        } else {
-            document.cookie = key + "=" + encodeURIComponent(value) + ";path=/;domain=" + domain;
-        }
+    set: function ( name, value, hour, domain, path='/', secure) {
+        
+        value = encodeURIComponent(value);
+        const expires =  hour ? '; expires=' + new Date((new Date()).getTime() + hour * 36e5).toUTCString() : '';
+        domain = domain ? '; domain=' + domain : '';
+        path = path ? '; path=' + path : '';
+        secure = secure ? '; secure=' + secure : '';
+
+        document.cookie = [name, '=', value, expires, path, domain, secure].join('');
+    },
+
+    remove: function(name, domain) {
+        this.set(name, '', -1, domain);
     }
 };
