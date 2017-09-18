@@ -30,54 +30,60 @@ export function checkInView (el, options={preLoad:1.3, preLoadTop:0}) {
 /**
 *进入视口后触发回调, 懒加载神器
 **/
-
-export function observerRegister(fn, container, autoDisconnect=true) {
-    let count = 0;
-    function callback (){
-      let firstTime = true;
-      return (entries, observer) => {
-          if (firstTime) {
-              firstTime = false
-              entries.filter((entry)=>entry.intersectionRatio).forEach(
-                  (entry) => {
-                    count--;
-                    observer.unobserve(entry.target);
-                    fn(entry.target, entry);
-                }
-              )
-
-          } else {
-              entries.forEach((entry) => {
-                  count--;
-              observer.unobserve(entry.target);
-              fn(entry.target, entry);
-              })
+export default class Observer {
+  count = 0;
+  _callback (){
+    let firstTime = true;
+    return (entries, observer) => {
+      if (firstTime) {
+        firstTime = false;
+        entries.filter((entry)=>entry.intersectionRatio).forEach(
+          (entry) => {
+            this.count--;
+            observer.unobserve(entry.target);
+            this.fn(entry.target, entry);
           }
-          if (!count && autoDisconnect) {
-              observer.disconnect()
-          }
+        )
+
+      } else {
+        entries.forEach((entry) => {
+          this.count--;
+          observer.unobserve(entry.target);
+          this.fn(entry.target, entry);
+        })
+      }
+      if (!this.count && this.autoDisconnect) {
+        this.disconnect()
       }
     }
-
-
-    let observer = new IntersectionObserver(
-      callback(),
+  }
+  constructor(fn, container, autoDisconnect=false){
+    this.fn = fn;
+    this.autoDisconnect = autoDisconnect;
+    this.observer = new IntersectionObserver(
+      this._callback(),
       {
-          root: container,
-          rootMargin: '0px 0px 130% 0px', // 距离根元素上下200px的时候触发
-          threshold: [0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1] // 刚刚进入就触发
+        root: container,
+        // rootMargin: '0px 0px -20% 0px', // 距离根元素上下200px的时候触发
+        threshold:  [0.2, 0.3,0.4,0.5,0.6,0.7,0.8,0.9,1] // 刚刚进入就触发
       }
     )
-
-
-    function observe(...els) {
-      els.forEach(el=>{
-          observer.observe(el);
-      count++;
+  }
+  observe(...els) {
+    els.forEach(el=>{
+      this.observer.observe(el);
+      this.count++;
     })
-    }
+  }
 
-    observe.disconnect = () => observer.disconnect()
-    observe.unobserve = (el) => observer.unobserve(el)
-    return observe
+  disconnect() {
+    this.observer.disconnect()
+  }
+
+  unobserve (...els){
+    els.forEach((el) => {
+      this.observer.unobserve(el)
+    })
+  }
+
 }
