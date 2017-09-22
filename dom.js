@@ -8,6 +8,15 @@ export function query(el) {
 }
 
 /**
+ * 生成一段dom
+ **/
+export function createDom(tpl) {
+  let container = document.createElement('div');
+  container.innerHTML = tpl;
+  return container.childNodes[0];
+};
+
+/**
 * 在target节点前插入el
 **/
 
@@ -38,6 +47,15 @@ export function prepend(el, target) {
 		target.appendChild(el)
 	}
 }
+
+/**
+ * 是否有className
+ **/
+export function hasClass(el, cls) {
+  let reg = new RegExp('(^|\\s)' + cls + '(\\s|$)');
+  return reg.test(el.className);
+}
+
 /**
  * 设置class, 会覆盖掉原有的
  **/
