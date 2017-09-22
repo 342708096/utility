@@ -11,5 +11,15 @@ export function offset(el) {
   return {
     left,
     top
-  };
-};
+  }
+}
+
+/**
+ * 检查是否进入视口
+ **/
+
+export function checkInView (el, options={preLoad:1.3, preLoadTop:0}) {
+  let {top,left,right,bottom} = el.getBoundingClientRect()
+  return (top < window.innerHeight * options.preLoad && bottom > options.preLoadTop) &&
+    (left < window.innerWidth * options.preLoad && right > 0)
+}
